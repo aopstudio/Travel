@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -13,13 +14,16 @@ public class RailSystem {
 	public ArrayList<String> names;
 	public ArrayList<String> strings;
 	private String str1;
-	private int[] dist = new int [25]; 
+	private int[] fee = new int [25];
+	private int[] dist=new int[25];
 	private int[] path=new int[25];
+	private boolean[] set=new boolean[25];
 	
 	public static void main(String[] args){
 		RailSystem system=new RailSystem();
 		system.load_services("services.txt");
 		system.print();
+		system.shotestPath("London", "h");
 	}
 	public RailSystem(){
 		
@@ -92,14 +96,54 @@ public class RailSystem {
 					Integer.parseInt(st.nextToken()));
 			city.edges.add(edge);
 			cities.set(fromNumber, city);
-			
 		}
-		
-
 	}
 	public void print(){//检验是否读取成功
 		for(City city:cities){
 			System.out.println(city.getName()+city.edges.get(0).desCity);
+		}
+	}
+	public void shotestPath(String fromCity,String desCity){
+		int from=names.indexOf(fromCity);
+		int des=names.indexOf(desCity);
+		int n=cities.size();
+		City city=cities.get(from);//找到出发城市
+		for(int i=0;i<n;i++){
+			if(i==from)
+				fee[i]=0;
+			fee[i]=Integer.MAX_VALUE;
+		}
+		Iterator<Service> iter=city.edges.iterator();
+		while(iter.hasNext()){
+			Service ser=iter.next();
+			fee[ser.desCity]=ser.fee;
+		}
+		for(int i=0;i<n;i++){
+			if(i!=from&&fee[i]<Integer.MAX_VALUE)
+				path[i]=from;
+			else
+				path[i]=-1;
+		}
+		set[from]=true;
+		for(int i=0;i<n-1;i++){
+			int min=Integer.MAX_VALUE;
+			int u=from;
+			for(int j=0;j<n;j++)
+				if(!set[j]&&fee[j]<min){
+					u=j;
+					min=fee[j];
+				}
+			set[u]=true;
+			city=cities.get(u);
+			iter=city.edges.iterator();
+			while(iter.hasNext()){
+				Service ser=iter.next();
+				if(!set[ser.desCity]&&ser.fee<Integer.MAX_VALUE&&
+						fee[u]+ser.fee<fee[ser.desCity]){
+					fee[ser.desCity]=fee[u]+ser.fee;
+					path[ser.desCity]=u;
+				}	
+			}
 		}
 	}
 	public void calc_route(){

@@ -4,9 +4,22 @@ import java.util.LinkedList;
 
 public class City {
 	private String name;
-	private LinkedList<City> adjacenList; 
-	public City() {
-		// TODO Auto-generated constructor stub
+	private City fromCity;
+	private int shortest;
+	public LinkedList<Service> edges;
+	
+	public City(){
+		edges=new LinkedList<Service>();
 	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
 
 }

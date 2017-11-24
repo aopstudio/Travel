@@ -4,8 +4,6 @@ import java.util.LinkedList;
 
 public class City {
 	private String name;
-	private City fromCity;
-	private int shortest;
 	public LinkedList<Service> edges;
 	
 	public City(){
@@ -19,7 +17,4 @@ public class City {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-
-
 }

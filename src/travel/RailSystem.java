@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.StringTokenizer;
 
 public class RailSystem {
@@ -14,21 +15,23 @@ public class RailSystem {
 	public ArrayList<String> names;
 	public ArrayList<String> strings;
 	private String str1;
+	private int totalDes;
 	private int[] fee = new int [25];
-	private int[] dist=new int[25];
 	private int[] path=new int[25];
 	private boolean[] set=new boolean[25];
 	
 	public static void main(String[] args){
 		RailSystem system=new RailSystem();
 		system.load_services("services.txt");
-		system.print();
-		system.shotestPath("London", "h");
-	}
-	public RailSystem(){
-		
-	}
-	
+		//system.print();
+		System.out.println("Enter a start and destination city");
+		String start;
+		String destination;
+		Scanner sc=new Scanner(System.in);
+		start=sc.next();
+		destination=sc.next();
+		system.shotestPath(start, destination);
+	}	
 	public void load_services(String filename){
 		
 		cities=new ArrayList<City>();
@@ -70,20 +73,16 @@ public class RailSystem {
 				cities.add(city);
 				names.add(str2);
 				str1=str2;
-			}	
-			
-			
+			}		
 		}
+		in.close();
 		try {
 			reader.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		//第二次读取，添加边的信息
-		
-		
+		//第二次读取，添加边的信息		
 		for(String line:strings){
 			StringTokenizer st=new StringTokenizer(line," ",false);
 			String from=st.nextToken();
@@ -98,11 +97,11 @@ public class RailSystem {
 			cities.set(fromNumber, city);
 		}
 	}
-	public void print(){//检验是否读取成功
+	/*public void print(){//检验是否读取成功
 		for(City city:cities){
 			System.out.println(city.getName()+city.edges.get(0).desCity);
 		}
-	}
+	}*/
 	public void shotestPath(String fromCity,String desCity){
 		int from=names.indexOf(fromCity);
 		int des=names.indexOf(desCity);
@@ -145,13 +144,41 @@ public class RailSystem {
 				}	
 			}
 		}
+		System.out.println("The cheapest route from "+fromCity+" to "+desCity);
+		System.out.println("costs "+fee[des]+" euros and spans "+
+				calc_route(from,des)+" kilometers");
+		recover_route(from,des);
 	}
-	public void calc_route(){
-		
+	public int calc_route(int from,int des){
+		int i=des;
+		totalDes=0;
+		while(i!=from){
+			int j=path[i];
+			City city=cities.get(j);
+			Iterator<Service> iter=city.edges.iterator();
+			while(iter.hasNext()){
+				Service ser=iter.next();
+				if(ser.desCity==i){
+					totalDes+=ser.distance;
+				}
+			}
+			i=j;
+		}
+		return totalDes;
 	}
-	public void recover_route(){
-		
+	public void recover_route(int from,int des){
+		int i=des;
+		Stack<String> route=new Stack<String>();
+		String cityName=names.get(i);
+		route.push(cityName);
+		while(i!=from){
+			i=path[i];
+			cityName=names.get(i);
+			route.push(cityName);
+		}
+		while(route.size()>1){
+			System.out.print(route.pop()+" to ");
+		}
+		System.out.println(route.pop());
 	}
-
-
 }
